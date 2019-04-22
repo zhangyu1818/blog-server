@@ -1,15 +1,15 @@
 import { Schema, model, Document } from 'mongoose';
 
-interface Categories extends Document {
+interface Tags extends Document {
     name: string;
     post: Schema.Types.ObjectId[];
 }
 
-const categoriesSchema = new Schema({
+const tagsSchema = new Schema({
     name: String,
     posts: [{ type: Schema.Types.ObjectId, ref: 'posts' }],
 });
 
-const CategoriesModel = model<Categories>('categories', categoriesSchema);
+const TagsModel = model<Tags>('tags', tagsSchema);
 
-export default CategoriesModel;
+export default TagsModel;

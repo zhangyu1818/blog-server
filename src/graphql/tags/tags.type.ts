@@ -2,8 +2,8 @@ import { ObjectType, Field, ID } from 'type-graphql';
 import Post from '../post/post.type';
 
 /* eslint-disable */
-@ObjectType()
-class Categories {
+@ObjectType({ description: 'post tags' })
+class Tags {
     @Field(type => ID)
     _id: string;
 
@@ -14,4 +14,4 @@ class Categories {
     posts: [Post];
 }
 
-export default Categories;
+export default Tags;
