@@ -13,6 +13,7 @@
     "devDependencies": {
         "@types/dotenv": "^6.1.1",
         "@types/koa": "^2.0.48",
+        "@types/lodash": "^4.14.123",
         "@types/mongoose": "^5.3.26",
         "@typescript-eslint/eslint-plugin": "^1.6.0",
         "@typescript-eslint/parser": "^1.6.0",
@@ -31,6 +32,7 @@
         "dotenv": "^7.0.0",
         "graphql": "^14.2.1",
         "koa": "^2.7.0",
+        "lodash": "^4.17.11",
         "mongoose": "^5.5.2",
         "reflect-metadata": "^0.1.13",
         "type-graphql": "^0.17.1"
