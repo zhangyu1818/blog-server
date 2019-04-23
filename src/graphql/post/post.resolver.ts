@@ -4,7 +4,7 @@ import { differenceBy, pullAll } from 'lodash';
 
 import Post, { LimitPost } from './post.type';
 import { AddPostInput, UpdatePostInput, PaginationInput } from './post.input';
-import { CategoriesType } from '../categories/categories.type';
+
 // mongoose model
 import PostModel from '../../schema/post.db';
 import CategoriesModel from '../../schema/categories.db';
@@ -82,10 +82,17 @@ class PostResolver {
         const oldPost = await PostModel.findByIdAndUpdate(id, { ...updatePost, updateTime: new Date() });
         const { categories = [], tags = [] } = updatePost;
         const { categories: oldCategories, tags: oldTags } = oldPost;
-        if (categories.length !== 0 && oldCategories.length !== 0) {
+        // remove categories ref posts id
+        if (oldCategories.length !== 0) {
             const removedCategories = pullAll(oldCategories, categories);
-            // todo: update post
+            await CategoriesModel.updateMany({ name: { $in: removedCategories } }, { $pull: { posts: id } });
         }
+        // remove tags ref posts id
+        if (oldTags.length !== 0) {
+            const removedTags = pullAll(oldTags, tags);
+            await TagsModel.updateMany({ name: { $in: removedTags } }, { $pull: { posts: id } });
+        }
+        return await PostModel.findById(id);
     }
 
     @Mutation(returns => Post, { description: 'delete post by id' })

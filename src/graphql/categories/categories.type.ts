@@ -1,12 +1,6 @@
 import { ObjectType, Field, ID } from 'type-graphql';
 import Post from '../post/post.type';
 
-export interface CategoriesType {
-    _id: string;
-    name: string;
-    posts: Post[];
-}
-
 /* eslint-disable */
 @ObjectType()
 class Categories {
