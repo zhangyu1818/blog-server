@@ -18,10 +18,13 @@ class Post {
     @Field(type => Date)
     postedTime: Date;
 
-    @Field(type => [String], { nullable: false })
+    @Field(type => Date, { nullable: true })
+    updateTime: Date;
+
+    @Field(type => [String], { nullable: 'items' })
     categories: string[];
 
-    @Field(type => [String], { nullable: false })
+    @Field(type => [String], { nullable: 'items' })
     tags: string[];
 }
 

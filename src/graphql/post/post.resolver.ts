@@ -1,10 +1,10 @@
 import { Resolver, Query, Mutation, Arg } from 'type-graphql';
 import { Document } from 'mongoose';
-import { differenceBy } from 'lodash';
+import { differenceBy, pullAll } from 'lodash';
 
 import Post, { LimitPost } from './post.type';
-import { AddPostInput, PaginationInput } from './post.input';
-
+import { AddPostInput, UpdatePostInput, PaginationInput } from './post.input';
+import { CategoriesType } from '../categories/categories.type';
 // mongoose model
 import PostModel from '../../schema/post.db';
 import CategoriesModel from '../../schema/categories.db';
@@ -44,39 +44,52 @@ class PostResolver {
 
     @Mutation(returns => Post, { description: 'add new post' })
     async addPost(@Arg('data') newPost: AddPostInput): Promise<Document> {
-        const post = await PostModel.create(newPost);
+        const post = await PostModel.create({ ...newPost, postedTime: new Date(), updateTime: null });
         const { categories, tags, _id } = post;
 
-        // push post id to saved categories
-        await CategoriesModel.updateMany({ name: { $in: categories } }, { $push: { posts: _id } });
-        // find unsaved categories and create it
-        const savedCategories = await CategoriesModel.find({ name: { $in: categories } });
-        const unSavedCategories = differenceBy(
-            post.categories.map(name => ({ name })),
-            savedCategories.map(({ name }) => ({ name })),
-            'name',
-        ).map(({ name }) => ({ name, posts: [_id] }));
-        // saving categories
-        await CategoriesModel.create(unSavedCategories);
-
-        // push post id to saved tags
-        await TagsModel.updateMany({ name: { $in: tags } }, { $push: { posts: _id } });
-        // find unsaved tags and create it
-        const savedTags = await TagsModel.find({ name: { $in: tags } });
-        const unSavedTags = differenceBy(
-            post.tags.map(name => ({ name })),
-            savedTags.map(({ name }) => ({ name })),
-            'name',
-        ).map(({ name }) => ({ name, posts: [_id] }));
-        // saving tags
-        await TagsModel.create(unSavedTags);
+        if (categories.length !== 0) {
+            // push post id to saved categories
+            await CategoriesModel.updateMany({ name: { $in: categories } }, { $push: { posts: _id } });
+            // find unsaved categories and create it
+            const savedCategories = await CategoriesModel.find({ name: { $in: categories } });
+            const unSavedCategories = differenceBy(
+                categories.map(name => ({ name })),
+                savedCategories.map(({ name }) => ({ name })),
+                'name',
+            ).map(({ name }) => ({ name, posts: [_id] }));
+            // saving categories
+            await CategoriesModel.create(unSavedCategories);
+        }
+        if (tags.length !== 0) {
+            // push post id to saved tags
+            await TagsModel.updateMany({ name: { $in: tags } }, { $push: { posts: _id } });
+            // find unsaved tags and create it
+            const savedTags = await TagsModel.find({ name: { $in: tags } });
+            const unSavedTags = differenceBy(
+                tags.map(name => ({ name })),
+                savedTags.map(({ name }) => ({ name })),
+                'name',
+            ).map(({ name }) => ({ name, posts: [_id] }));
+            // saving tags
+            await TagsModel.create(unSavedTags);
+        }
 
         return post;
     }
 
-    // Todo: update or delete should returns a state
+    @Mutation(returns => Post, { description: 'update post by id' })
+    async updatePost(@Arg('id') id: string, @Arg('data') updatePost: UpdatePostInput) {
+        const oldPost = await PostModel.findByIdAndUpdate(id, { ...updatePost, updateTime: new Date() });
+        const { categories = [], tags = [] } = updatePost;
+        const { categories: oldCategories, tags: oldTags } = oldPost;
+        if (categories.length !== 0 && oldCategories.length !== 0) {
+            const removedCategories = pullAll(oldCategories, categories);
+            // todo: update post
+        }
+    }
+
     @Mutation(returns => Post, { description: 'delete post by id' })
-    async deletePost(@Arg('id') id: string) {
+    async deletePost(@Arg('id') id: string): Promise<Document> {
         const post = await PostModel.findByIdAndDelete(id);
         const { categories, tags, _id } = post;
         // pull the post id from categories

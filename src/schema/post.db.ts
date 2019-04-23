@@ -5,6 +5,7 @@ interface Post extends Document {
     content: string;
     markdown: string;
     postedTime: Date;
+    updateTime: Date | null;
     categories: string[];
     tags: string[];
 }
@@ -14,8 +15,9 @@ const postSchema = new Schema({
     content: String,
     markdown: String,
     postedTime: Date,
-    categories: [String],
-    tags: [String],
+    updateTime: Date,
+    categories: { type: [String], default: [] },
+    tags: { type: [String], default: [] },
 });
 
 const PostModel = model<Post>('posts', postSchema);

@@ -13,16 +13,30 @@ class AddPostInput implements Partial<Post> {
     @Field(type => String)
     markdown: string;
 
-    @Field(type => Date)
-    postedTime: Date;
+    @Field(type => [String], { nullable: true })
+    categories?: string[];
 
-    @Field(type => [String], { nullable: false })
-    categories: string[];
-
-    @Field(type => [String], { nullable: false })
-    tags: string[];
+    @Field(type => [String], { nullable: true })
+    tags?: string[];
 }
 
+@InputType({ description: 'post update input type' })
+class UpdatePostInput implements Partial<Post> {
+    @Field(type => String, { nullable: true })
+    title?: string;
+
+    @Field(type => String, { nullable: true })
+    content?: string;
+
+    @Field(type => String, { nullable: true })
+    markdown?: string;
+
+    @Field(type => [String], { nullable: true })
+    categories?: string[];
+
+    @Field(type => [String], { nullable: true })
+    tags?: string[];
+}
 @InputType({ description: 'pagination input' })
 class PaginationInput {
     @Field(type => Number, { defaultValue: 1 })
@@ -32,4 +46,4 @@ class PaginationInput {
     pageSize: number;
 }
 
-export { AddPostInput, PaginationInput };
+export { AddPostInput, UpdatePostInput, PaginationInput };

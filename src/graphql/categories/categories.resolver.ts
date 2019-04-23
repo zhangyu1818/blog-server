@@ -8,7 +8,6 @@ import PostModel from '../../schema/post.db';
 /* eslint-disable*/
 @Resolver()
 class CategoriesResolver {
-    // Todo: add new category when the categories are not exist it
     @Query(returns => [Categories], { description: 'query categories' })
     async categories() {
         return await CategoriesModel.find({}).populate('posts');
@@ -19,7 +18,13 @@ class CategoriesResolver {
         return await CategoriesModel.findById(id).populate('posts');
     }
 
-    // Todo: update or delete should returns a state
+    @Mutation(returns => Categories, { description: 'create a new category', nullable: true })
+    async addCategory(@Arg('name') name: string) {
+        const isExist = await CategoriesModel.findOne({ name });
+        if (isExist) return null;
+        return await CategoriesModel.create({ name, posts: [] });
+    }
+
     @Mutation(returns => Categories, { description: 'change category name' })
     async changeCategoryName(@Arg('id') id: string, @Arg('name') name: string) {
         // update category name,find old name
@@ -27,6 +32,14 @@ class CategoriesResolver {
         // change posts ref categories name
         await PostModel.updateMany({ categories: oldName }, { 'categories.$': name });
         return await CategoriesModel.findById(id);
+    }
+
+    @Mutation(returns => Categories, { description: 'delete category by id' })
+    async deleteCategory(@Arg('id') id: string) {
+        const category = await CategoriesModel.findByIdAndDelete(id);
+        const { name } = category;
+        await PostModel.updateMany({ categories: name }, { $pull: { categories: name } });
+        return category;
     }
 }
 
