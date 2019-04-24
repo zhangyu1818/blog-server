@@ -6,6 +6,7 @@ interface Post extends Document {
     markdown: string;
     postedTime: Date;
     updateTime: Date | null;
+    revisionCount: number;
     categories: string[];
     tags: string[];
 }
@@ -16,6 +17,7 @@ const postSchema = new Schema({
     markdown: String,
     postedTime: Date,
     updateTime: Date,
+    revisionCount: Number,
     categories: { type: [String], default: [] },
     tags: { type: [String], default: [] },
 });

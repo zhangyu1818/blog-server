@@ -1,4 +1,4 @@
-import { InputType, Field } from 'type-graphql';
+import { InputType, Field, Int } from 'type-graphql';
 import Post from './post.type';
 
 /* eslint-disable */
@@ -39,10 +39,10 @@ class UpdatePostInput implements Partial<Post> {
 }
 @InputType({ description: 'pagination input' })
 class PaginationInput {
-    @Field(type => Number, { defaultValue: 1 })
+    @Field(type => Int, { defaultValue: 1 })
     currentPage: number;
 
-    @Field(type => Number, { defaultValue: 10 })
+    @Field(type => Int, { defaultValue: 10 })
     pageSize: number;
 }
 

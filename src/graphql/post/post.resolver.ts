@@ -44,7 +44,7 @@ class PostResolver {
 
     @Mutation(returns => Post, { description: 'add new post' })
     async addPost(@Arg('data') newPost: AddPostInput): Promise<Document> {
-        const post = await PostModel.create({ ...newPost, postedTime: new Date(), updateTime: null });
+        const post = await PostModel.create({ ...newPost, postedTime: new Date(), updateTime: null, revisionCount: 0 });
         const { categories, tags, _id } = post;
 
         if (categories.length !== 0) {
@@ -79,7 +79,11 @@ class PostResolver {
 
     @Mutation(returns => Post, { description: 'update post by id' })
     async updatePost(@Arg('id') id: string, @Arg('data') updatePost: UpdatePostInput) {
-        const oldPost = await PostModel.findByIdAndUpdate(id, { ...updatePost, updateTime: new Date() });
+        const oldPost = await PostModel.findByIdAndUpdate(id, {
+            ...updatePost,
+            updateTime: new Date(),
+            $inc: { revisionCount: 1 },
+        });
         const { categories = [], tags = [] } = updatePost;
         const { categories: oldCategories, tags: oldTags } = oldPost;
         // remove categories ref posts id

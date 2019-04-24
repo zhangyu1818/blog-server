@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from 'type-graphql';
+import { ObjectType, Field, ID, Int } from 'type-graphql';
 
 /* eslint-disable */
 @ObjectType()
@@ -21,6 +21,9 @@ class Post {
     @Field(type => Date, { nullable: true })
     updateTime: Date;
 
+    @Field(type => Int)
+    revisionCount: number;
+
     @Field(type => [String], { nullable: 'items' })
     categories: string[];
 
@@ -30,13 +33,13 @@ class Post {
 
 @ObjectType()
 class Pagination {
-    @Field(type => Number)
+    @Field(type => Int)
     currentPage: number;
 
-    @Field(type => Number)
+    @Field(type => Int)
     pageSize: number;
 
-    @Field(type => Number)
+    @Field(type => Int)
     total: number;
 }
 
