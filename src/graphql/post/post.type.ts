@@ -1,5 +1,11 @@
 import { ObjectType, Field, ID, Int } from 'type-graphql';
 
+export enum PostType {
+    'draft' = 'draft',
+    'published' = 'published',
+    'trash' = 'trash',
+}
+
 /* eslint-disable */
 @ObjectType()
 class Post {
@@ -29,6 +35,9 @@ class Post {
 
     @Field(type => [String], { nullable: 'items' })
     tags: string[];
+
+    @Field(type => String)
+    type: string;
 }
 
 @ObjectType()

@@ -1,5 +1,6 @@
 import { InputType, Field, Int } from 'type-graphql';
 import Post from './post.type';
+import { PostType } from './post.type';
 
 /* eslint-disable */
 @InputType({ description: 'post input type' })
@@ -18,6 +19,9 @@ class AddPostInput implements Partial<Post> {
 
     @Field(type => [String], { nullable: true })
     tags?: string[];
+
+    @Field(type => String, { defaultValue: PostType.draft })
+    type: string;
 }
 
 @InputType({ description: 'post update input type' })

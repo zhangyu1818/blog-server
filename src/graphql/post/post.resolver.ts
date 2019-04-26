@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Arg } from 'type-graphql';
 import { Document } from 'mongoose';
 import { differenceBy, pullAll } from 'lodash';
 
-import Post, { LimitPost } from './post.type';
+import Post, { LimitPost, PostType } from './post.type';
 import { AddPostInput, UpdatePostInput, PaginationInput } from './post.input';
 
 // mongoose model
@@ -22,9 +22,19 @@ export interface Posts {
 /* eslint-disable */
 @Resolver()
 class PostResolver {
-    @Query(returns => [Post], { description: 'query all posts' })
+    @Query(returns => [Post], { description: 'query published posts' })
     async posts(): Promise<Document[]> {
-        return PostModel.find({});
+        return PostModel.find({ type: PostType.published });
+    }
+
+    @Query(returns => [Post], { description: 'query draft posts' })
+    async draft(): Promise<Document[]> {
+        return PostModel.find({ type: PostType.draft });
+    }
+
+    @Query(returns => [Post], { description: 'query trash posts' })
+    async trash(): Promise<Document[]> {
+        return PostModel.find({ type: PostType.draft });
     }
 
     @Query(returns => LimitPost, { description: 'query posts by pagination' })

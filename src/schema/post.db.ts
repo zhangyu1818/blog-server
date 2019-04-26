@@ -9,6 +9,7 @@ interface Post extends Document {
     revisionCount: number;
     categories: string[];
     tags: string[];
+    type: string;
 }
 
 const postSchema = new Schema({
@@ -20,6 +21,7 @@ const postSchema = new Schema({
     revisionCount: Number,
     categories: { type: [String], default: [] },
     tags: { type: [String], default: [] },
+    type: String,
 });
 
 const PostModel = model<Post>('posts', postSchema);

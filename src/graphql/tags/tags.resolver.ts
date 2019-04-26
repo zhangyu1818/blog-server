@@ -4,12 +4,13 @@ import Tags from './tags.type';
 // mongoose model
 import TagsModel from '../../schema/tags.db';
 import PostModel from '../../schema/post.db';
+import { PostType } from '../post/post.type';
 
 /* eslint-disable */
 @Resolver()
 class TagsResolver {
     @Query(returns => [Tags], { description: 'query tags' })
-    async tags() {
+    async tags(@Arg('type', { defaultValue: PostType.published }) type: String) {
         return await TagsModel.find({}).populate('posts');
     }
 

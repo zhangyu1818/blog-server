@@ -4,13 +4,17 @@ import Categories from './categories.type';
 // mongoose model
 import CategoriesModel from '../../schema/categories.db';
 import PostModel from '../../schema/post.db';
+import { PostType } from '../post/post.type';
 
 /* eslint-disable*/
 @Resolver()
 class CategoriesResolver {
     @Query(returns => [Categories], { description: 'query categories' })
-    async categories() {
-        return await CategoriesModel.find({}).populate('posts');
+    async categories(@Arg('type', { defaultValue: PostType.published }) type: String) {
+        return await CategoriesModel.find({}).populate({
+            path: 'posts',
+            match: { type },
+        });
     }
 
     @Query(returns => Categories, { description: 'query category by id' })
