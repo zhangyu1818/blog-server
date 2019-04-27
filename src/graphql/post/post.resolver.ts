@@ -38,12 +38,15 @@ class PostResolver {
     }
 
     @Query(returns => LimitPost, { description: 'query posts by pagination' })
-    async limitPosts(@Arg('pagination') pagination: PaginationInput): Promise<Posts> {
+    async limitPosts(
+        @Arg('pagination') pagination: PaginationInput,
+        @Arg('type', { defaultValue: PostType.published }) type: String,
+    ): Promise<Posts> {
         const { currentPage, pageSize } = pagination;
-        const posts = await PostModel.find({})
+        const posts = await PostModel.find({ type })
             .limit(pageSize)
             .skip((currentPage - 1) * pageSize);
-        const total = await PostModel.estimatedDocumentCount();
+        const total = await PostModel.countDocuments({ type });
         return { posts, pagination: { currentPage, pageSize, total } };
     }
 
