@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID, Int } from 'type-graphql';
 
-export enum PostType {
+enum PostType {
     'draft' = 'draft',
     'published' = 'published',
     'trash' = 'trash',
@@ -62,4 +62,4 @@ class LimitPost {
 }
 
 export default Post;
-export { Pagination, LimitPost };
+export { Pagination, LimitPost, PostType };

@@ -1,6 +1,5 @@
 import { InputType, Field, Int } from 'type-graphql';
-import Post from './post.type';
-import { PostType } from './post.type';
+import Post, { PostType } from './post.type';
 
 /* eslint-disable */
 @InputType({ description: 'post input type' })
@@ -40,7 +39,11 @@ class UpdatePostInput implements Partial<Post> {
 
     @Field(type => [String], { nullable: true })
     tags?: string[];
+
+    @Field(type => String, { nullable: true })
+    type?: string;
 }
+
 @InputType({ description: 'pagination input' })
 class PaginationInput {
     @Field(type => Int, { defaultValue: 1 })
