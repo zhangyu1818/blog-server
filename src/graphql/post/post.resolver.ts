@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg } from 'type-graphql';
 import { Document } from 'mongoose';
-import { differenceBy, pullAll } from 'lodash';
+import { difference, differenceBy } from 'lodash';
 
 import Post, { LimitPost, PostType } from './post.type';
 import { AddPostInput, UpdatePostInput, PaginationInput } from './post.input';
@@ -71,7 +71,7 @@ class PostResolver {
                 'name',
             ).map(({ name }) => ({ name, posts: [_id] }));
             // saving categories
-            await CategoriesModel.create(unSavedCategories);
+            if (unSavedCategories.length !== 0) await CategoriesModel.create(unSavedCategories);
         }
         if (tags.length !== 0) {
             // push post id to saved tags
@@ -84,7 +84,7 @@ class PostResolver {
                 'name',
             ).map(({ name }) => ({ name, posts: [_id] }));
             // saving tags
-            await TagsModel.create(unSavedTags);
+            if (unSavedTags.length !== 0) await TagsModel.create(unSavedTags);
         }
 
         return post;
@@ -99,15 +99,36 @@ class PostResolver {
         });
         const { categories = [], tags = [] } = updatePost;
         const { categories: oldCategories, tags: oldTags } = oldPost;
-        // remove categories ref posts id
-        if (oldCategories.length !== 0) {
-            const removedCategories = pullAll(oldCategories, categories);
+        // update categories
+        const removedCategories = difference(oldCategories, categories);
+        const newCategories = difference(categories, oldCategories);
+        // remove categories ref
+        if (removedCategories.length !== 0)
             await CategoriesModel.updateMany({ name: { $in: removedCategories } }, { $pull: { posts: id } });
+        // if has new categories
+        if (newCategories.length !== 0) {
+            // if categories name exist
+            await CategoriesModel.updateMany({ name: { $in: newCategories } }, { $push: { posts: id } });
+            // create unsaved categories
+            const savedCategories = await CategoriesModel.find({ name: { $in: newCategories } });
+            const unSavedCategories = difference(newCategories, savedCategories.map(({ name }) => name));
+            if (unSavedCategories.length !== 0)
+                await CategoriesModel.create(unSavedCategories.map(name => ({ name, posts: [id] })));
         }
-        // remove tags ref posts id
-        if (oldTags.length !== 0) {
-            const removedTags = pullAll(oldTags, tags);
+        // update tags
+        const removedTags = difference(oldTags, tags);
+        const newTags = difference(tags, oldTags);
+        // if tags name exist
+        if (removedTags.length !== 0)
             await TagsModel.updateMany({ name: { $in: removedTags } }, { $pull: { posts: id } });
+        // if has new tags
+        if (newTags.length !== 0) {
+            // if tags name exist
+            await TagsModel.updateMany({ name: { $in: newTags } }, { $push: { posts: id } });
+            // create unsaved tags
+            const savedTags = await TagsModel.find({ name: { $in: newTags } });
+            const unSavedTags = difference(newTags, savedTags.map(({ name }) => name));
+            if (unSavedTags.length !== 0) await TagsModel.create(unSavedTags.map(name => ({ name, posts: [id] })));
         }
         return await PostModel.findById(id);
     }
