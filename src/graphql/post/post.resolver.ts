@@ -24,17 +24,17 @@ export interface Posts {
 class PostResolver {
     @Query(returns => [Post], { description: 'query published posts' })
     async posts(): Promise<Document[]> {
-        return PostModel.find({ type: PostType.published });
+        return await PostModel.find({ type: PostType.published });
     }
 
     @Query(returns => [Post], { description: 'query draft posts' })
     async draft(): Promise<Document[]> {
-        return PostModel.find({ type: PostType.draft });
+        return await PostModel.find({ type: PostType.draft });
     }
 
     @Query(returns => [Post], { description: 'query trash posts' })
     async trash(): Promise<Document[]> {
-        return PostModel.find({ type: PostType.draft });
+        return await PostModel.find({ type: PostType.draft });
     }
 
     @Query(returns => LimitPost, { description: 'query posts by pagination' })
