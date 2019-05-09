@@ -5,7 +5,7 @@ const router = new Router();
 
 router.post(
     '/login',
-    async (ctx): Promise<any> => {
+    async (ctx): Promise<void> => {
         const { userName, password } = ctx.request.body;
         // UserModel.create({ userName, password, type: 'admin' });
         const user = await UserModel.find({ userName, password });
