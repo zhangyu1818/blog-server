@@ -16,4 +16,15 @@ router.post(
     },
 );
 
+router.get(
+    '/checkUser',
+    async (ctx): Promise<void> => {
+        if (ctx.session.userInfo) {
+            ctx.response.body = { status: 'ok', type: 'account', currentAuthority: 'admin' };
+            return;
+        }
+        ctx.response.body = { status: 'error', type: 'account', currentAuthority: 'guest' };
+    },
+);
+
 export default router.routes();

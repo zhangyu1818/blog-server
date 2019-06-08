@@ -38,6 +38,8 @@ const runServer = async (): Promise<void> => {
     const schema = await Schema();
     const server = new ApolloServer({
         schema,
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        context: ({ ctx }) => ({ ctx }),
     });
     server.applyMiddleware({ app });
     const port = process.env.PORT || 4000;

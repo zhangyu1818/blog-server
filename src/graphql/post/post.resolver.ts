@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg } from 'type-graphql';
+import { Resolver, Query, Mutation, Arg, Authorized } from 'type-graphql';
 import { Document } from 'mongoose';
 import { difference, differenceBy } from 'lodash';
 
@@ -27,14 +27,16 @@ class PostResolver {
         return await PostModel.find({ type: PostType.published });
     }
 
+    @Authorized()
     @Query(returns => [Post], { description: 'query draft posts' })
     async draft(): Promise<Document[]> {
         return await PostModel.find({ type: PostType.draft });
     }
 
+    @Authorized()
     @Query(returns => [Post], { description: 'query trash posts' })
     async trash(): Promise<Document[]> {
-        return await PostModel.find({ type: PostType.draft });
+        return await PostModel.find({ type: PostType.trash });
     }
 
     @Query(returns => LimitPost, { description: 'query posts by pagination' })
@@ -55,6 +57,7 @@ class PostResolver {
         return await PostModel.findById(id);
     }
 
+    @Authorized()
     @Mutation(returns => Post, { description: 'add new post' })
     async addPost(@Arg('data') newPost: AddPostInput): Promise<Document> {
         const post = await PostModel.create({ ...newPost, postedTime: new Date(), updateTime: null, revisionCount: 0 });
@@ -90,6 +93,7 @@ class PostResolver {
         return post;
     }
 
+    @Authorized()
     @Mutation(returns => Post, { description: 'update post by id' })
     async updatePost(@Arg('id') id: string, @Arg('data') updatePost: UpdatePostInput) {
         const oldPost = await PostModel.findByIdAndUpdate(id, {
@@ -133,6 +137,7 @@ class PostResolver {
         return await PostModel.findById(id);
     }
 
+    @Authorized()
     @Mutation(returns => Post, { description: 'delete post by id' })
     async deletePost(@Arg('id') id: string): Promise<Document> {
         const post = await PostModel.findByIdAndDelete(id);
